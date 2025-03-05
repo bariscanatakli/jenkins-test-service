@@ -8,39 +8,31 @@ pipeline {
             }
         }
         
-        stage('Install npm') {
-            steps {
-                sh '''
-                if ! command -v npm &> /dev/null
-                then
-                    echo "npm could not be found, installing..."
-                    sudo apt update
-                    sudo apt install -y nodejs npm
-                else
-                    echo "npm is already installed"
-                fi
-                '''
-            }
-        }
-        
-        stage('Backend Tests') {
+        stage('Install Dependencies') {
             steps {
                 dir('backend/nestjs-api') {
                     sh 'npm install'
+                }
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                dir('backend/nestjs-api') {
                     sh 'npm run test'
                 }
             }
         }
         
-        stage('Build Service Image') {
+        stage('Build Docker Image') {
             steps {
-                sh 'docker-compose build service'
+                sh 'docker-compose build backend'
             }
         }
         
         stage('Deploy Service') {
             steps {
-                sh 'docker-compose up -d service'
+                sh 'docker-compose up -d backend'
             }
         }
     }
