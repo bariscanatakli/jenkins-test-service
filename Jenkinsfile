@@ -8,6 +8,21 @@ pipeline {
             }
         }
         
+        stage('Install npm') {
+            steps {
+                sh '''
+                if ! command -v npm &> /dev/null
+                then
+                    echo "npm could not be found, installing..."
+                    sudo apt update
+                    sudo apt install -y nodejs npm
+                else
+                    echo "npm is already installed"
+                fi
+                '''
+            }
+        }
+        
         stage('Backend Tests') {
             steps {
                 dir('backend/nestjs-api') {
